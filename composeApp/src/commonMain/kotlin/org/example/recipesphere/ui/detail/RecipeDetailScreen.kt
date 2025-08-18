@@ -31,6 +31,11 @@ import org.example.recipesphere.domain.model.Recipe
 import org.example.recipesphere.util.nowEpochMs
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,8 +51,12 @@ fun RecipeDetailScreen(
             TopAppBar(
                 title = { Text("Recipe") },
                 navigationIcon = {
-                    // Keep it icon-free to avoid extra deps; swap to IconButton later if you want.
-                    TextButton(onClick = onBack) { Text("Back") }
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
                 }
             )
         }
