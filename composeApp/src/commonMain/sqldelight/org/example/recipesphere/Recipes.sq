@@ -1,0 +1,31 @@
+-- Table
+CREATE TABLE recipes (
+  id TEXT NOT NULL PRIMARY KEY,
+  title TEXT NOT NULL,
+  photoUrl TEXT,
+  timeMinutes INTEGER NOT NULL,
+  instructions TEXT NOT NULL,
+  location TEXT,
+  authorId TEXT NOT NULL,
+  createdAtEpochMs INTEGER NOT NULL
+);
+
+-- Queries
+selectAll:
+SELECT * FROM recipes
+ORDER BY createdAtEpochMs DESC;
+
+selectById:
+SELECT * FROM recipes
+WHERE id = ?;
+
+insertOrReplace:
+INSERT OR REPLACE INTO recipes(
+  id, title, photoUrl, timeMinutes, instructions, location, authorId, createdAtEpochMs
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+
+deleteById:
+DELETE FROM recipes WHERE id = ?;
+
+deleteAll:
+DELETE FROM recipes;
