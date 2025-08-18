@@ -1,0 +1,7 @@
+platform :ios, '14.0'
+use_frameworks!
+inhibit_all_warnings!
+
+target 'iosApp' do
+  # Compose Multiplatform frameworks are produced by Gradle
+end
