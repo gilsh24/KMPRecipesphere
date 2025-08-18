@@ -25,14 +25,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.example.recipesphere.domain.model.Recipe
+import org.example.recipesphere.domain.repository.RecipeRepository
 import org.example.recipesphere.ui.components.RecipeCard
 import org.example.recipesphere.ui.components.SearchField
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecipesListScreen(
-    viewModel: RecipesListViewModel = remember { RecipesListViewModel() },
-    onRecipeClick: (Recipe) -> Unit = {}
+    viewModel: RecipesListViewModel = run {
+        val repo: RecipeRepository = koinInject()
+        remember { RecipesListViewModel(repo) }
+    },    onRecipeClick: (Recipe) -> Unit = {}
 ) {
     val state by viewModel.uiState.collectAsState()
     var query by remember { mutableStateOf("") }

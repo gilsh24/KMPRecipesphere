@@ -76,6 +76,7 @@ kotlin {
             implementation(libs.kotlinx.serialization.core)
             implementation(libs.kotlinx.serialization.json)
             implementation(compose.materialIconsExtended)
+            implementation(libs.koin.compose.v356)
         }
 
         commonTest.dependencies {

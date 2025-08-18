@@ -36,14 +36,18 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import org.example.recipesphere.domain.repository.RecipeRepository
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecipeDetailScreen(
     recipeId: String,
     onBack: () -> Unit = {},
-    viewModel: RecipeDetailViewModel = remember { RecipeDetailViewModel(recipeId) }
-) {
+    viewModel: RecipeDetailViewModel = run {
+        val repo: RecipeRepository = koinInject()
+        remember { RecipeDetailViewModel(repo, recipeId) }
+    }) {
     val state by viewModel.uiState.collectAsState()
 
     Scaffold(

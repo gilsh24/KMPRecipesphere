@@ -1,19 +1,15 @@
 package org.example.recipesphere.ui.recipes.detail
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
+import org.example.recipesphere.domain.repository.RecipeRepository
+import org.example.recipesphere.util.AppResult
 
-/**
- * Simple, self-contained VM (mock-only).
- * Later we can swap this to your BaseViewModel + real use-cases.
- */
-class RecipeDetailViewModel(private val recipeId: String) {
-
+class RecipeDetailViewModel(
+    private val repo: RecipeRepository,
+    private val recipeId: String
+) {
     private val job = Job()
     private val scope = CoroutineScope(Dispatchers.Main + job)
 
@@ -25,12 +21,10 @@ class RecipeDetailViewModel(private val recipeId: String) {
     private fun load() {
         scope.launch {
             _uiState.emit(RecipeDetailState.Loading)
-            delay(400) // simulate network/db work
-            val recipe = FakeRecipeSource.loadById(recipeId)
-            if (recipe != null) {
-                _uiState.emit(RecipeDetailState.Loaded(recipe))
-            } else {
-                _uiState.emit(RecipeDetailState.Error("Recipe not found"))
+            delay(200)
+            when (val res = repo.getRecipe(recipeId)) {
+                is AppResult.Ok  -> _uiState.emit(RecipeDetailState.Loaded(res.value))
+                is AppResult.Err -> _uiState.emit(RecipeDetailState.Error(res.error.message ?: "Not found"))
             }
         }
     }

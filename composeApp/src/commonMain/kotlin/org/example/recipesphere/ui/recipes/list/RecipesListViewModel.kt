@@ -1,41 +1,33 @@
 package org.example.recipesphere.ui.recipes.list
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
+import org.example.recipesphere.domain.repository.RecipeRepository
+import org.example.recipesphere.util.AppResult
 
-/**
- * Simple, self-contained VM (no expect/actual, no DI) just for mocking.
- * Later you can replace this with your BaseViewModel pattern + real use-cases.
- */
-class RecipesListViewModel {
-
+class RecipesListViewModel(
+    private val repo: RecipeRepository
+) {
     private val job = Job()
     private val scope = CoroutineScope(Dispatchers.Main + job)
 
     private val _uiState = MutableStateFlow<RecipesListState>(RecipesListState.Loading)
     val uiState: StateFlow<RecipesListState> = _uiState
 
-    init { loadFake() }
+    init { load() }
 
-    private fun loadFake() {
+    private fun load(force: Boolean = false) {
         scope.launch {
             _uiState.emit(RecipesListState.Loading)
-            delay(600) // pretend to fetch
-            val data = FakeRecipes.sampleList()
-            _uiState.emit(RecipesListState.Loaded(data))
+            delay(250)
+            when (val res = repo.listRecipes(force)) {
+                is AppResult.Ok  -> _uiState.emit(RecipesListState.Loaded(res.value))
+                is AppResult.Err -> _uiState.emit(RecipesListState.Error(res.error.message ?: "Unknown error"))
+            }
         }
     }
 
-    fun onRefresh() {
-        loadFake()
-    }
-
-    fun onCleared() {
-        job.cancel()
-    }
+    fun onRefresh() = load(force = true)
+    fun onCleared() { job.cancel() }
 }
