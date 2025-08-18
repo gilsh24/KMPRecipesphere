@@ -5,19 +5,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import org.example.recipesphere.recipes.ui.screens.splash.SplashScreen
+import org.example.recipesphere.ui.recipes.list.RecipesListScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun App() {
-    val appTitle = remember { "Recipes CMP" }
+    val appTitle = remember { "Recipespere" }
     MaterialTheme {
         Scaffold(
             topBar = {
                 TopAppBar(title = { Text(appTitle) })
             }
-        ) { innerPadding ->
-            // For Stage A, show Splash only. Navigation comes later.
-            SplashScreen(innerPadding = innerPadding)
+        ) {
+            RecipesListScreen()
         }
     }
 }

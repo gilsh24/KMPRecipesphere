@@ -17,6 +17,7 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
 import org.example.recipesphere.data.dao.SqlDelightDatabase
+import org.koin.core.qualifier.named
 
 // Your entry points
 fun initKoin(config: KoinAppDeclaration? = null) {
@@ -53,6 +54,12 @@ val commonModule = module {
 
     single { AppDatabase(get()) }
     single { get<AppDatabase>().recipesQueries }
+//    single(named("FirebaseApiKey")) { "<PUT_YOUR_FIREBASE_WEB_API_KEY>" }
+    // --- add Auth API ---
+//    single { AuthApi(http = get<HttpClient>(), apiKey = get(named("FirebaseApiKey"))) }
+
+    // --- add Auth Repository (no SecureStore) ---
+//    single<AuthRepository> { AuthRepositoryImpl(authApi = get()) }
 }
 
 // Helpers
