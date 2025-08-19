@@ -21,4 +21,12 @@ class RecipesRemoteDataSourceFirebase(
         val doc = db.collection("recipes").document(id).get()
         return doc.data(Recipe.serializer())
     }
+
+    override suspend fun upsert(recipe: Recipe) {
+        db.collection("recipes").document(recipe.id).set(recipe)
+    }
+
+    override suspend fun delete(id: String) {
+        db.collection("recipes").document(id).delete()
+    }
 }

@@ -12,8 +12,11 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -36,7 +39,9 @@ fun RecipesListScreen(
     viewModel: RecipesListViewModel = run {
         val repo: RecipeRepository = koinInject()
         remember { RecipesListViewModel(repo) }
-    },    onRecipeClick: (Recipe) -> Unit = {}
+    },    onRecipeClick: (Recipe) -> Unit = {},
+            onCreateClick: () -> Unit = {}        // <-- new
+
 ) {
     val state by viewModel.uiState.collectAsState()
     var query by remember { mutableStateOf("") }
@@ -54,6 +59,11 @@ fun RecipesListScreen(
 //                    }
                 }
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = onCreateClick) {
+                Icon(Icons.Filled.Add, contentDescription = "Create")
+            }
         }
     ) { innerPadding ->
         when (val s = state) {

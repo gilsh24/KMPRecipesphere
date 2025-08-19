@@ -22,6 +22,7 @@ import org.example.recipesphere.recipes.ui.screens.splash.SplashScreen
 import org.example.recipesphere.ui.auth.login.LoginScreen
 import org.example.recipesphere.ui.profile.ProfileScreen
 import org.example.recipesphere.ui.detail.RecipeDetailScreen
+import org.example.recipesphere.ui.recipes.create.CreateRecipeScreen
 import org.example.recipesphere.ui.recipes.list.RecipesListScreen
 
 @Composable
@@ -92,6 +93,9 @@ fun AppNavGraph() {
                 RecipesListScreen(
                     onRecipeClick = { recipe ->
                         nav.navigate(RecipeDetailRoute(id = recipe.id))
+                    },
+                    onCreateClick = {
+                        nav.navigate(CreateRecipeRoute)     // <-- add this
                     }
                 )
             }
@@ -100,6 +104,17 @@ fun AppNavGraph() {
                 RecipeDetailScreen(
                     recipeId = args.id,
                     onBack = { nav.popBackStack() }
+                )
+            }
+            composable<CreateRecipeRoute> {
+                CreateRecipeScreen(
+                    onBack = { nav.popBackStack() },
+                    onCreated = { id ->
+                        // After creating, go to detail and clear Create from back stack
+                        nav.navigate(RecipeDetailRoute(id)) {
+                            popUpTo<RecipesListRoute> { inclusive = false }
+                        }
+                    }
                 )
             }
             composable<SplashRoute> { SplashScreen(innerPadding) }

@@ -7,3 +7,4 @@ import kotlinx.serialization.Serializable
 @Serializable object RecipesListRoute
 @Serializable data class RecipeDetailRoute(val id: String)
 @Serializable object ProfileRoute
+@Serializable object CreateRecipeRoute      // <-- add this

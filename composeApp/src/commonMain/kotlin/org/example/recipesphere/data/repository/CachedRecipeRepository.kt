@@ -10,6 +10,7 @@ class CachedRecipeRepository(
     private val local: RecipesLocalDataSource,
     private val remote: RecipesRemoteDataSource
 ) : RecipeRepository {
+
     override suspend fun listRecipes(forceRefresh: Boolean): AppResult<List<Recipe>> = try {
         if (forceRefresh || local.isEmpty()) {
             val fresh = remote.fetchAll()
@@ -35,15 +36,22 @@ class CachedRecipeRepository(
         }
     }
 
-    override suspend fun createRecipe(recipe: Recipe) = AppResult.Ok(recipe).also {
-        local.upsertAll(listOf(recipe)) // (we’ll sync to remote later)
+    override suspend fun createRecipe(recipe: Recipe): AppResult<Recipe> = try {
+        remote.upsert(recipe)                 // write remote
+        local.upsertAll(listOf(recipe))       // cache locally
+        AppResult.Ok(recipe)
+    } catch (t: Throwable) {
+        AppResult.Err(t)
     }
-    override suspend fun updateRecipe(recipe: Recipe) = createRecipe(recipe)
-    override suspend fun deleteRecipe(id: String): AppResult<Unit> {
-        val current = local.getAll().toMutableList()
-        val removed = current.removeAll { it.id == id }
-        if (!removed) return AppResult.Err(NoSuchElementException("Recipe $id"))
-        local.replaceAll(current)
-        return AppResult.Ok(Unit)
+
+    override suspend fun updateRecipe(recipe: Recipe): AppResult<Recipe> = createRecipe(recipe)
+
+    override suspend fun deleteRecipe(id: String): AppResult<Unit> = try {
+        remote.delete(id)
+        val remain = local.getAll().filterNot { it.id == id }
+        local.replaceAll(remain)
+        AppResult.Ok(Unit)
+    } catch (t: Throwable) {
+        AppResult.Err(t)
     }
 }
