@@ -18,6 +18,7 @@ import coil3.compose.AsyncImagePainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.text.KeyboardOptions
+import org.example.recipesphere.ui.components.Poster
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -68,19 +69,12 @@ fun CreateRecipeScreen(
             }
 
             if (ui.photoUrl.isNotBlank()) {
-                SubcomposeAsyncImage(
-                    model = ui.photoUrl,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
+                Poster(
+                    url = ui.photoUrl,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(160.dp)
-                ) {
-                    when (painter.state.value) {
-                        is AsyncImagePainter.State.Loading -> Box(Modifier.fillMaxWidth()) { CircularProgressIndicator() }
-                        else -> SubcomposeAsyncImageContent()
-                    }
-                }
+                )
             }
 
             OutlinedTextField(

@@ -132,3 +132,7 @@ dependencies {
     debugImplementation(compose.uiTooling)
 }
 
+compose.resources {
+    packageOfResClass = "org.example.recipesphere.resources"
+    publicResClass = true
+}

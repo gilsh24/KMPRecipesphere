@@ -42,6 +42,7 @@ import coil3.compose.AsyncImagePainter
 import coil3.compose.SubcomposeAsyncImage
 import coil3.compose.SubcomposeAsyncImageContent
 import org.example.recipesphere.domain.repository.RecipeRepository
+import org.example.recipesphere.ui.components.Poster
 import org.example.recipesphere.ui.recipes.detail.RecipeDetailState
 import org.example.recipesphere.ui.recipes.detail.RecipeDetailViewModel
 import org.koin.compose.koinInject
@@ -107,23 +108,13 @@ private fun DetailContent(
             .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
         // Image placeholder (we'll plug a real image loader later)
-        SubcomposeAsyncImage(
-            model = recipe.photoUrl,
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
+        Poster(
+            url = recipe.photoUrl,
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(16f / 9f)
                 .clip(RoundedCornerShape(12.dp))
-        ) {
-            when (painter.state.value) {
-                is AsyncImagePainter.State.Loading -> Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
-                }
-                is AsyncImagePainter.State.Error -> Box(Modifier.fillMaxWidth()) { /* placeholder */ }
-                else -> SubcomposeAsyncImageContent()
-            }
-        }
+        )
 
         Spacer(Modifier.height(16.dp))
 
