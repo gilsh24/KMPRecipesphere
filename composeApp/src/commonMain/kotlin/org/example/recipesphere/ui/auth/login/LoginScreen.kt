@@ -1,39 +1,26 @@
 package org.example.recipesphere.ui.auth.login
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import org.koin.compose.koinInject
+import org.example.recipesphere.domain.repository.AuthRepository
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
     onLoginSuccess: () -> Unit,
-    viewModel: LoginViewModel = remember { LoginViewModel() }
+    viewModel: LoginViewModel = run {
+        val authRepo: AuthRepository = koinInject()
+        remember { LoginViewModel(authRepo) }
+    }
 ) {
     val ui by viewModel.ui.collectAsState()
 
-    // Navigate once when we flip to logged-in
     LaunchedEffect(ui.isLoggedIn) {
         if (ui.isLoggedIn) {
             onLoginSuccess()
@@ -68,29 +55,37 @@ fun LoginScreen(
                 label = { Text("Password") },
                 isError = ui.passwordError != null,
                 supportingText = { if (ui.passwordError != null) Text(ui.passwordError!!) },
-                singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
+                singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(Modifier.height(20.dp))
+            Spacer(Modifier.height(12.dp))
+
+            if (ui.errorMessage != null) {
+                Text(ui.errorMessage!!, color = MaterialTheme.colorScheme.error)
+                Spacer(Modifier.height(8.dp))
+            }
 
             Button(
-                onClick = { viewModel.submit() },
-                enabled = ui.canSubmit,
+                onClick = { viewModel.signIn() },
+                enabled = ui.canSubmit && !ui.isLoading,
                 modifier = Modifier.fillMaxWidth()
             ) { Text(if (ui.isLoading) "Signing in…" else "Sign in") }
 
             Spacer(Modifier.height(8.dp))
 
+            OutlinedButton(
+                onClick = { viewModel.signUp() },
+                enabled = ui.canSubmit && !ui.isLoading,
+                modifier = Modifier.fillMaxWidth()
+            ) { Text("Create account") }
+
+            Spacer(Modifier.height(8.dp))
+
             TextButton(
-                onClick = onLoginSuccess, // "guest" path for now
+                onClick = onLoginSuccess, // keep guest path if you like
                 enabled = !ui.isLoading
             ) { Text("Continue as guest") }
-
-            if (ui.isLoading) {
-                Spacer(Modifier.height(16.dp))
-                CircularProgressIndicator()
-            }
         }
     }
 }

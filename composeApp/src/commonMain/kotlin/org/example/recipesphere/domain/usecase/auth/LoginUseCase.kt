@@ -5,5 +5,5 @@ import org.example.recipesphere.util.AppResult
 
 class LoginUseCase(private val authRepository: AuthRepository) {
     suspend operator fun invoke(email: String, password: String) =
-        authRepository.login(email, password)
+        authRepository.signIn(email, password)
 }

@@ -2,6 +2,7 @@ package org.example.recipesphere.di
 
 import app.cash.sqldelight.db.SqlDriver
 import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.auth.auth
 import dev.gitlive.firebase.firestore.firestore
 import dev.gitlive.firebase.storage.FirebaseStorage
 import dev.gitlive.firebase.storage.storage
@@ -15,6 +16,7 @@ import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import org.example.recipesphere.AppDatabase
+import org.example.recipesphere.data.auth.FirebaseAuthRepository
 import org.koin.core.context.startKoin
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
@@ -30,6 +32,7 @@ import org.example.recipesphere.data.remote.RecipesRemoteDataSourceFirebase
 import org.example.recipesphere.data.repository.CachedRecipeRepository
 import org.example.recipesphere.data.repository.FakeRecipeRepository
 import org.example.recipesphere.data.seed.RecipeSeeder
+import org.example.recipesphere.domain.repository.AuthRepository
 import org.example.recipesphere.domain.repository.RecipeRepository
 import org.koin.core.qualifier.named
 
@@ -65,13 +68,14 @@ val commonModule = module {
 
     // Optional: expose generated queries if you like
     single { SqlDelightDatabase(get()) }
-
+    single { Firebase.auth}
     single { AppDatabase(get()) }
     single { get<AppDatabase>().recipesQueries }
     single { Firebase.firestore }
     single<FirebaseStorage> { Firebase.storage }
 
-    single { RecipeSeeder(get()) }         // <-- add this
+    single<AuthRepository> { FirebaseAuthRepository(get()) }
+    single { RecipeSeeder(get()) }
     single { RecipesLocalDataSource(get()) }
 //    single { RecipesRemoteDataSourceFake() }
     single<PhotoUploader> { FirebasePhotoUploader(get()) }
