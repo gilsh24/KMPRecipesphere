@@ -5,37 +5,52 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import org.example.recipesphere.data.seed.RecipeSeeder
+import org.example.recipesphere.domain.repository.AuthRepository
+import org.example.recipesphere.util.AppResult
 
 data class ProfileUiState(
-    val isSeeding: Boolean = false,
-    val message: String? = null
+    val email: String? = null,
+    val isLoading: Boolean = false,
+    val error: String? = null,
+    val loggedOut: Boolean = false
 )
 
 class ProfileViewModel(
-    private val seeder: RecipeSeeder
+    private val auth: AuthRepository
 ) {
     private val job = Job()
     private val scope = CoroutineScope(Dispatchers.Main + job)
 
-    private val _ui = MutableStateFlow(ProfileUiState())
+    private val _ui = MutableStateFlow(
+        ProfileUiState(email = auth.currentUser()?.email)
+    )
     val ui: StateFlow<ProfileUiState> = _ui
 
-    fun seed() {
-        if (_ui.value.isSeeding) return
+    init {
+        // keep email in sync with auth state
         scope.launch {
-            _ui.value = _ui.value.copy(isSeeding = true, message = null)
-            runCatching { seeder.seed() }
-                .onSuccess { count ->
-                    _ui.value = ProfileUiState(isSeeding = false, message = "Seeded $count recipes. Go refresh the list.")
-                }
-                .onFailure { t ->
-                    _ui.value = ProfileUiState(isSeeding = false, message = "Seeding failed: ${t.message}")
-                }
+            auth.authState.collectLatest { user ->
+                _ui.value = _ui.value.copy(email = user?.email)
+            }
         }
     }
 
+    fun signOut() {
+        if (_ui.value.isLoading) return
+        scope.launch {
+            _ui.value = _ui.value.copy(isLoading = true, error = null)
+            when (val res = auth.signOut()) {
+                is AppResult.Ok  -> _ui.value = _ui.value.copy(isLoading = false, loggedOut = true)
+                is AppResult.Err -> _ui.value = _ui.value.copy(isLoading = false, error = res.error.message ?: "Failed to sign out")
+            }
+        }
+    }
+
+    fun consumeLoggedOut() {
+        if (_ui.value.loggedOut) _ui.value = _ui.value.copy(loggedOut = false)
+    }
+
     fun onCleared() { job.cancel() }
-    fun clearMessage() { _ui.value = _ui.value.copy(message = null) }
 }

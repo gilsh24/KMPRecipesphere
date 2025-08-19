@@ -120,10 +120,10 @@ fun AppNavGraph() {
             composable<SplashRoute> { SplashScreen(innerPadding) }
             composable<ProfileRoute> {
                 ProfileScreen(
-                    onLogoutClick = {
+                    onLoggedOut = {
                         // mock: go back to Login and clear stack
                         nav.navigate(LoginRoute) {
-                            popUpTo(0) { inclusive = true } // clear whole stack
+                            popUpTo(0) { inclusive = true }
                         }
                     }
                 )

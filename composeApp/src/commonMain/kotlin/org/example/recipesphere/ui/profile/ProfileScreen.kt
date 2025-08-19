@@ -7,18 +7,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.koin.compose.koinInject
+import org.example.recipesphere.domain.repository.AuthRepository
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
-    onLogoutClick: () -> Unit = {},
-    // inject the VM using koinInject to keep your DI style
+    onLoggedOut: () -> Unit, // navigate after real sign-out
     viewModel: ProfileViewModel = run {
-        val seeder = koinInject<org.example.recipesphere.data.seed.RecipeSeeder>()
-        remember { ProfileViewModel(seeder) }
+        val auth: AuthRepository = koinInject()
+        remember { ProfileViewModel(auth) }
     }
 ) {
     val ui by viewModel.ui.collectAsState()
+
+    // Navigate back to Login when logout completes
+    LaunchedEffect(ui.loggedOut) {
+        if (ui.loggedOut) {
+            onLoggedOut()
+            viewModel.consumeLoggedOut()
+        }
+    }
 
     Scaffold(
         topBar = { TopAppBar(title = { Text("Profile") }) }
@@ -30,16 +38,22 @@ fun ProfileScreen(
             contentAlignment = Alignment.Center
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("Hello, guest 👋", style = MaterialTheme.typography.titleLarge)
-                Spacer(Modifier.height(12.dp))
-                Button(onClick = onLogoutClick, enabled = !ui.isSeeding) { Text("Log out (mock)") }
-                Spacer(Modifier.height(20.dp))
-                Button(onClick = { viewModel.seed() }, enabled = !ui.isSeeding) {
-                    Text(if (ui.isSeeding) "Seeding…" else "Seed sample recipes")
+                Text(
+                    text = ui.email?.let { "Signed in as: $it" } ?: "Not signed in",
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Spacer(Modifier.height(16.dp))
+
+                Button(
+                    onClick = { viewModel.signOut() },
+                    enabled = !ui.isLoading
+                ) {
+                    Text(if (ui.isLoading) "Signing out…" else "Log out")
                 }
-                if (ui.message != null) {
+
+                if (ui.error != null) {
                     Spacer(Modifier.height(12.dp))
-                    Text(ui.message!!, style = MaterialTheme.typography.bodyMedium)
+                    Text(ui.error!!, color = MaterialTheme.colorScheme.error)
                 }
             }
         }

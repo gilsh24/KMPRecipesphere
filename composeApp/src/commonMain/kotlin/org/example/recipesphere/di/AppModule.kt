@@ -31,7 +31,6 @@ import org.example.recipesphere.data.remote.RecipesRemoteDataSourceFake
 import org.example.recipesphere.data.remote.RecipesRemoteDataSourceFirebase
 import org.example.recipesphere.data.repository.CachedRecipeRepository
 import org.example.recipesphere.data.repository.FakeRecipeRepository
-import org.example.recipesphere.data.seed.RecipeSeeder
 import org.example.recipesphere.domain.repository.AuthRepository
 import org.example.recipesphere.domain.repository.RecipeRepository
 import org.koin.core.qualifier.named
@@ -75,7 +74,6 @@ val commonModule = module {
     single<FirebaseStorage> { Firebase.storage }
 
     single<AuthRepository> { FirebaseAuthRepository(get()) }
-    single { RecipeSeeder(get()) }
     single { RecipesLocalDataSource(get()) }
 //    single { RecipesRemoteDataSourceFake() }
     single<PhotoUploader> { FirebasePhotoUploader(get()) }
