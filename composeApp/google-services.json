@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "141572363842",
+    "project_id": "recipesphere-531b8",
+    "storage_bucket": "recipesphere-531b8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:141572363842:android:02690aca957628c720ffdb",
+        "android_client_info": {
+          "package_name": "org.example.recipesphere"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBCpCJNaFyGnnOP79eoallvXVMc4A-O-80"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

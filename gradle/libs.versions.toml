@@ -14,6 +14,7 @@ androidx-testExt = "1.2.1"
 coilCompose = "3.3.0"
 coilNetworkKtor2 = "3.3.0"
 composeMultiplatform = "1.8.2"
+firebaseFirestore = "2.1.0"
 junit = "4.13.2"
 koinCompose = "3.5.6"
 kotlin = "2.1.0"
@@ -24,6 +25,8 @@ kotlinxSerializationCore = "1.6.3"
 navigationCompose = "2.9.0-beta05"
 sqlDelight = "2.1.0"
 ktorClientCore = "3.0.1"
+firebaseBom = "33.14.0"
+firebaseCommonKtx = "21.0.0"
 
 [libraries]
 coil-network-ktor2 = { module = "io.coil-kt.coil3:coil-network-ktor2", version.ref = "coilNetworkKtor2" }
@@ -31,6 +34,7 @@ coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCo
 coroutines-extensions = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqlDelight" }
 android-driver = { module = "app.cash.sqldelight:android-driver", version.ref = "sqlDelight" }
 androidx-activity-compose-v192 = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
+firebase-firestore = { module = "dev.gitlive:firebase-firestore", version.ref = "firebaseFirestore" }
 koin-compose-v356 = { module = "io.insert-koin:koin-compose", version.ref = "koinCompose" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-testJunit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
@@ -60,6 +64,10 @@ ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "kto
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktorClientCore" }
 ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktorClientCore" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktorClientCore" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-common = { module = "dev.gitlive:firebase-common", version.ref = "firebaseFirestore" }
+firebase-auth = { module = "dev.gitlive:firebase-auth", version.ref = "firebaseFirestore" }
+firebase-common-ktx = { module = "com.google.firebase:firebase-common-ktx", version.ref = "firebaseCommonKtx" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

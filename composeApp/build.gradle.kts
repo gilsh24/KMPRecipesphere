@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.sqldelight)
     alias(libs.plugins.kotlin.serialization)
+    id("com.google.gms.google-services")
 }
 
 kotlin {
@@ -51,6 +52,7 @@ kotlin {
             implementation(libs.androidx.activity.compose.v192)
             implementation(libs.ktor.client.okhttp)
             implementation(libs.android.driver)
+            implementation(libs.firebase.common.ktx)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -79,7 +81,13 @@ kotlin {
             implementation(libs.koin.compose.v356)
             implementation(libs.coil.compose)
             implementation(libs.coil.network.ktor2)
-
+            implementation(libs.kotlinx.serialization.core)
+            implementation(libs.kotlinx.serialization.json)
+            implementation(project.dependencies.platform(libs.firebase.bom))
+            implementation(libs.firebase.common)
+            implementation(libs.firebase.auth)
+            implementation(libs.firebase.firestore)
+//            implementation(libs.firebase.common.ktx)
         }
 
         commonTest.dependencies {
