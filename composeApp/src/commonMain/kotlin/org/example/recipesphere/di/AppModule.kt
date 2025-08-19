@@ -17,6 +17,9 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
 import org.example.recipesphere.data.dao.SqlDelightDatabase
+import org.example.recipesphere.data.local.RecipesLocalDataSource
+import org.example.recipesphere.data.remote.RecipesRemoteDataSourceFake
+import org.example.recipesphere.data.repository.CachedRecipeRepository
 import org.example.recipesphere.data.repository.FakeRecipeRepository
 import org.example.recipesphere.domain.repository.RecipeRepository
 import org.koin.core.qualifier.named
@@ -57,7 +60,10 @@ val commonModule = module {
     single { AppDatabase(get()) }
     single { get<AppDatabase>().recipesQueries }
 
-    single<RecipeRepository> { FakeRecipeRepository() }
+    single { RecipesLocalDataSource(get()) }
+    single { RecipesRemoteDataSourceFake() }
+
+    single<RecipeRepository> { CachedRecipeRepository(local = get(), remote = get()) }
 
 //    single(named("FirebaseApiKey")) { "<PUT_YOUR_FIREBASE_WEB_API_KEY>" }
     // --- add Auth API ---
