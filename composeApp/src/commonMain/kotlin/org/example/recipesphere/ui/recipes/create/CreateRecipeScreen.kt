@@ -1,7 +1,6 @@
 package org.example.recipesphere.ui.recipes.create
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -11,6 +10,14 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import org.koin.compose.koinInject
 import org.example.recipesphere.domain.repository.RecipeRepository
+import org.example.recipesphere.data.remote.PhotoUploader
+import org.example.recipesphere.ui.components.ImagePickerButton
+import coil3.compose.SubcomposeAsyncImage
+import coil3.compose.SubcomposeAsyncImageContent
+import coil3.compose.AsyncImagePainter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.text.KeyboardOptions
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -19,16 +26,15 @@ fun CreateRecipeScreen(
     onCreated: (String) -> Unit = {},
     viewModel: CreateRecipeViewModel = run {
         val repo: RecipeRepository = koinInject()
-        remember { CreateRecipeViewModel(repo) }
+        val uploader: PhotoUploader = koinInject()
+        remember { CreateRecipeViewModel(repo, uploader) }
     }
 ) {
     val ui by viewModel.ui.collectAsState()
 
-    // navigate after successful creation
     LaunchedEffect(ui.createdId) {
         ui.createdId?.let { id ->
-            onCreated(id)
-            viewModel.consumeNavigation()
+            onCreated(id); viewModel.consumeNavigation()
         }
     }
 
@@ -37,9 +43,7 @@ fun CreateRecipeScreen(
             TopAppBar(
                 title = { Text("Create Recipe") },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
-                    }
+                    IconButton(onClick = onBack) { Icon(Icons.Filled.ArrowBack, null) }
                 }
             )
         }
@@ -51,17 +55,38 @@ fun CreateRecipeScreen(
                 .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            // Photo section
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                ImagePickerButton(
+                    enabled = !ui.isUploadingPhoto && !ui.isSubmitting
+                ) { bytes ->
+                    viewModel.onImagePicked(bytes)
+                }
+                if (ui.isUploadingPhoto) {
+                    CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                }
+            }
+
+            if (ui.photoUrl.isNotBlank()) {
+                SubcomposeAsyncImage(
+                    model = ui.photoUrl,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(160.dp)
+                ) {
+                    when (painter.state.value) {
+                        is AsyncImagePainter.State.Loading -> Box(Modifier.fillMaxWidth()) { CircularProgressIndicator() }
+                        else -> SubcomposeAsyncImageContent()
+                    }
+                }
+            }
+
             OutlinedTextField(
                 value = ui.title,
                 onValueChange = viewModel::onTitleChange,
                 label = { Text("Title") },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth()
-            )
-            OutlinedTextField(
-                value = ui.photoUrl,
-                onValueChange = viewModel::onPhotoUrlChange,
-                label = { Text("Photo URL (optional)") },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )

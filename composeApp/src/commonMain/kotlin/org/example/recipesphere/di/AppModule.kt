@@ -3,6 +3,8 @@ package org.example.recipesphere.di
 import app.cash.sqldelight.db.SqlDriver
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.firestore.firestore
+import dev.gitlive.firebase.storage.FirebaseStorage
+import dev.gitlive.firebase.storage.storage
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -20,6 +22,8 @@ import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
 import org.example.recipesphere.data.dao.SqlDelightDatabase
 import org.example.recipesphere.data.local.RecipesLocalDataSource
+import org.example.recipesphere.data.remote.FirebasePhotoUploader
+import org.example.recipesphere.data.remote.PhotoUploader
 import org.example.recipesphere.data.remote.RecipesRemoteDataSource
 import org.example.recipesphere.data.remote.RecipesRemoteDataSourceFake
 import org.example.recipesphere.data.remote.RecipesRemoteDataSourceFirebase
@@ -65,9 +69,12 @@ val commonModule = module {
     single { AppDatabase(get()) }
     single { get<AppDatabase>().recipesQueries }
     single { Firebase.firestore }
+    single<FirebaseStorage> { Firebase.storage }
+
     single { RecipeSeeder(get()) }         // <-- add this
     single { RecipesLocalDataSource(get()) }
 //    single { RecipesRemoteDataSourceFake() }
+    single<PhotoUploader> { FirebasePhotoUploader(get()) }
 
     single<RecipesRemoteDataSource> { RecipesRemoteDataSourceFirebase(get()) }
     single<RecipeRepository> { CachedRecipeRepository(local = get(), remote = get()) }

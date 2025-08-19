@@ -8,6 +8,7 @@ import org.example.recipesphere.domain.repository.RecipeRepository
 import org.example.recipesphere.util.AppResult
 import org.example.recipesphere.util.newId
 import org.example.recipesphere.util.nowEpochMs
+import org.example.recipesphere.data.remote.PhotoUploader
 
 data class CreateRecipeUiState(
     val title: String = "",
@@ -15,19 +16,21 @@ data class CreateRecipeUiState(
     val timeMinutesText: String = "",
     val instructions: String = "",
     val isSubmitting: Boolean = false,
+    val isUploadingPhoto: Boolean = false,
     val error: String? = null,
     val createdId: String? = null
 ) {
     val timeMinutes: Int? = timeMinutesText.toIntOrNull()
     val canSubmit: Boolean =
-        !isSubmitting &&
+        !isSubmitting && !isUploadingPhoto &&
                 title.isNotBlank() &&
                 instructions.isNotBlank() &&
                 (timeMinutes ?: -1) >= 0
 }
 
 class CreateRecipeViewModel(
-    private val repo: RecipeRepository
+    private val repo: RecipeRepository,
+    private val uploader: PhotoUploader
 ) {
     private val job = Job()
     private val scope = CoroutineScope(Dispatchers.Main + job)
@@ -40,6 +43,21 @@ class CreateRecipeViewModel(
     fun onTimeMinutesChange(v: String)  { _ui.value = _ui.value.copy(timeMinutesText = v.filter { it.isDigit() }, error = null) }
     fun onInstructionsChange(v: String) { _ui.value = _ui.value.copy(instructions = v, error = null) }
 
+    fun onImagePicked(bytes: ByteArray) {
+        // generate a stable filename now (before we have a recipe id)
+        val fileName = "${newId(prefix = "img")}.jpg"
+        scope.launch {
+            _ui.value = _ui.value.copy(isUploadingPhoto = true, error = null)
+            runCatching {
+                uploader.upload(bytes, fileName, contentType = "image/jpeg")
+            }.onSuccess { url ->
+                _ui.value = _ui.value.copy(isUploadingPhoto = false, photoUrl = url)
+            }.onFailure { t ->
+                _ui.value = _ui.value.copy(isUploadingPhoto = false, error = "Upload failed: ${t.message}")
+            }
+        }
+    }
+
     fun submit() {
         val s = _ui.value
         if (!s.canSubmit) return
@@ -50,8 +68,8 @@ class CreateRecipeViewModel(
             photoUrl = s.photoUrl.takeIf { it.isNotBlank() },
             timeMinutes = s.timeMinutes ?: 0,
             instructions = s.instructions.trim(),
-            location = null,           // added later (device API)
-            authorId = "me",           // swap to real user when auth is ready
+            location = null,
+            authorId = "me",
             createdAtEpochMs = nowEpochMs()
         )
         scope.launch {
