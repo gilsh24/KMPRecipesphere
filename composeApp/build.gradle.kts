@@ -53,6 +53,7 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
             implementation(libs.android.driver)
             implementation(libs.firebase.common.ktx)
+            implementation(libs.play.services.location)
         }
         commonMain.dependencies {
             implementation(compose.runtime)

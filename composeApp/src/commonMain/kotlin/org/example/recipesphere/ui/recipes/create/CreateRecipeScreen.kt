@@ -1,23 +1,39 @@
 package org.example.recipesphere.ui.recipes.create
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.runtime.remember
 import org.koin.compose.koinInject
 import org.example.recipesphere.domain.repository.RecipeRepository
 import org.example.recipesphere.data.remote.PhotoUploader
 import org.example.recipesphere.ui.components.ImagePickerButton
-import coil3.compose.SubcomposeAsyncImage
-import coil3.compose.SubcomposeAsyncImageContent
-import coil3.compose.AsyncImagePainter
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.text.KeyboardOptions
+import org.example.recipesphere.ui.components.LocationPickerButton
 import org.example.recipesphere.ui.components.Poster
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,7 +51,8 @@ fun CreateRecipeScreen(
 
     LaunchedEffect(ui.createdId) {
         ui.createdId?.let { id ->
-            onCreated(id); viewModel.consumeNavigation()
+            onCreated(id)
+            viewModel.consumeNavigation()
         }
     }
 
@@ -44,7 +61,7 @@ fun CreateRecipeScreen(
             TopAppBar(
                 title = { Text("Create Recipe") },
                 navigationIcon = {
-                    IconButton(onClick = onBack) { Icon(Icons.Filled.ArrowBack, null) }
+                    IconButton(onClick = onBack) { Icon(Icons.Filled.ArrowBack, contentDescription = "Back") }
                 }
             )
         }
@@ -56,7 +73,7 @@ fun CreateRecipeScreen(
                 .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Photo section
+            // Image + Location actions
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 ImagePickerButton(
                     enabled = !ui.isUploadingPhoto && !ui.isSubmitting
@@ -64,10 +81,20 @@ fun CreateRecipeScreen(
                     viewModel.onImagePicked(bytes)
                 }
                 if (ui.isUploadingPhoto) {
-                    CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                    CircularProgressIndicator(modifier = Modifier.height(24.dp))
+                }
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                // Device location (Android actual)
+                LocationPickerButton(
+                    enabled = !ui.isUploadingPhoto && !ui.isSubmitting
+                ) { label, lat, lon ->
+                    viewModel.setLocation(label, lat, lon)
                 }
             }
 
+            // Show chosen photo preview
             if (ui.photoUrl.isNotBlank()) {
                 Poster(
                     url = ui.photoUrl,
@@ -77,6 +104,11 @@ fun CreateRecipeScreen(
                 )
             }
 
+            // Show chosen location (if any)
+            ui.locationLabel?.let {
+                Text("Location: $it", style = MaterialTheme.typography.bodyMedium)
+            }
+
             OutlinedTextField(
                 value = ui.title,
                 onValueChange = viewModel::onTitleChange,
@@ -84,6 +116,7 @@ fun CreateRecipeScreen(
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
+
             OutlinedTextField(
                 value = ui.timeMinutesText,
                 onValueChange = viewModel::onTimeMinutesChange,
@@ -92,6 +125,7 @@ fun CreateRecipeScreen(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth()
             )
+
             OutlinedTextField(
                 value = ui.instructions,
                 onValueChange = viewModel::onInstructionsChange,
