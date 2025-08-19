@@ -1,7 +1,7 @@
 package org.example.recipesphere.ui.recipes.list
 
 import org.example.recipesphere.domain.model.Recipe
-import org.example.recipesphere.util.nowEpochMs   // <-- add this import
+import org.example.recipesphere.util.nowEpochMs
 
 internal object FakeRecipes {
     fun sampleList(): List<Recipe> {
@@ -10,7 +10,7 @@ internal object FakeRecipes {
             Recipe(
                 id = "1",
                 title = "Shakshuka",
-                photoUrl = null,
+                photoUrl = "https://picsum.photos/seed/shakshuka/1200/675",
                 timeMinutes = 25,
                 instructions = "Sauté onions & peppers, add tomatoes, crack eggs, cover.",
                 location = "Tel Aviv, IL",
@@ -20,7 +20,7 @@ internal object FakeRecipes {
             Recipe(
                 id = "2",
                 title = "Hummus",
-                photoUrl = null,
+                photoUrl = "https://picsum.photos/seed/hummus/1200/675",
                 timeMinutes = 10,
                 instructions = "Blend chickpeas, tahini, lemon, garlic, salt.",
                 location = "Haifa, IL",
@@ -30,7 +30,7 @@ internal object FakeRecipes {
             Recipe(
                 id = "3",
                 title = "Pasta al Limone",
-                photoUrl = null,
+                photoUrl = "https://picsum.photos/seed/limone/1200/675",
                 timeMinutes = 18,
                 instructions = "Butter, lemon zest, cream, parmesan; toss with pasta.",
                 location = "Rome, IT",
@@ -40,7 +40,7 @@ internal object FakeRecipes {
             Recipe(
                 id = "4",
                 title = "Chicken Shawarma",
-                photoUrl = null,
+                photoUrl = "https://picsum.photos/seed/shawarma/1200/675",
                 timeMinutes = 40,
                 instructions = "Marinate, roast, slice; serve with pita & tahini.",
                 location = "Jerusalem, IL",

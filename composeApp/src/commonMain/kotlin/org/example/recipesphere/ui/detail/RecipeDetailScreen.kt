@@ -1,4 +1,4 @@
-package org.example.recipesphere.ui.recipes.detail
+package org.example.recipesphere.ui.detail
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
@@ -34,9 +34,16 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.ui.layout.ContentScale
+import coil3.compose.AsyncImagePainter
+import coil3.compose.SubcomposeAsyncImage
+import coil3.compose.SubcomposeAsyncImageContent
 import org.example.recipesphere.domain.repository.RecipeRepository
+import org.example.recipesphere.ui.recipes.detail.RecipeDetailState
+import org.example.recipesphere.ui.recipes.detail.RecipeDetailViewModel
 import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -100,12 +107,23 @@ private fun DetailContent(
             .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
         // Image placeholder (we'll plug a real image loader later)
-        Box(
+        SubcomposeAsyncImage(
+            model = recipe.photoUrl,
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(16f / 9f)
                 .clip(RoundedCornerShape(12.dp))
-        )
+        ) {
+            when (painter.state.value) {
+                is AsyncImagePainter.State.Loading -> Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+                is AsyncImagePainter.State.Error -> Box(Modifier.fillMaxWidth()) { /* placeholder */ }
+                else -> SubcomposeAsyncImageContent()
+            }
+        }
 
         Spacer(Modifier.height(16.dp))
 

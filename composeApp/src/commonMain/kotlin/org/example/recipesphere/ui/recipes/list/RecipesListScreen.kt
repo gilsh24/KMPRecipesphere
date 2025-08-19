@@ -26,7 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.example.recipesphere.domain.model.Recipe
 import org.example.recipesphere.domain.repository.RecipeRepository
-import org.example.recipesphere.ui.components.RecipeCard
+import org.example.recipesphere.ui.recipes.list.RecipeCard
 import org.example.recipesphere.ui.components.SearchField
 import org.koin.compose.koinInject
 

@@ -21,7 +21,7 @@ import androidx.navigation.toRoute
 import org.example.recipesphere.recipes.ui.screens.splash.SplashScreen
 import org.example.recipesphere.ui.auth.login.LoginScreen
 import org.example.recipesphere.ui.profile.ProfileScreen
-import org.example.recipesphere.ui.recipes.detail.RecipeDetailScreen
+import org.example.recipesphere.ui.detail.RecipeDetailScreen
 import org.example.recipesphere.ui.recipes.list.RecipesListScreen
 
 @Composable
