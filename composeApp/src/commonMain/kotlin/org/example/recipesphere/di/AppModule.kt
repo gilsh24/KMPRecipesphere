@@ -25,6 +25,7 @@ import org.example.recipesphere.data.remote.RecipesRemoteDataSourceFake
 import org.example.recipesphere.data.remote.RecipesRemoteDataSourceFirebase
 import org.example.recipesphere.data.repository.CachedRecipeRepository
 import org.example.recipesphere.data.repository.FakeRecipeRepository
+import org.example.recipesphere.data.seed.RecipeSeeder
 import org.example.recipesphere.domain.repository.RecipeRepository
 import org.koin.core.qualifier.named
 
@@ -64,7 +65,7 @@ val commonModule = module {
     single { AppDatabase(get()) }
     single { get<AppDatabase>().recipesQueries }
     single { Firebase.firestore }
-
+    single { RecipeSeeder(get()) }         // <-- add this
     single { RecipesLocalDataSource(get()) }
 //    single { RecipesRemoteDataSourceFake() }
 
