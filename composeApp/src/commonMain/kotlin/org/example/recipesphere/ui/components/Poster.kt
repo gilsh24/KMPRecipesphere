@@ -7,6 +7,7 @@ import coil3.compose.AsyncImage
 import org.jetbrains.compose.resources.painterResource
 import org.example.recipesphere.resources.Res
 import org.example.recipesphere.resources.diehard
+import org.example.recipesphere.ui.imageloading.rememberAppImageLoader
 
 @Composable
 fun Poster(
@@ -14,8 +15,11 @@ fun Poster(
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Crop
 ) {
+    val imageLoader = rememberAppImageLoader()
+
     AsyncImage(
         model = url ?: "",
+        imageLoader = imageLoader,
         contentDescription = null,
         modifier = modifier,
         contentScale = contentScale,
