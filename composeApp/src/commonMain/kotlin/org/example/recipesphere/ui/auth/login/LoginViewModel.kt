@@ -3,7 +3,6 @@ package org.example.recipesphere.ui.auth.login
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
 import org.example.recipesphere.domain.repository.AuthRepository
 import org.example.recipesphere.util.AppResult
 
@@ -34,25 +33,23 @@ class LoginViewModel(
     val ui: StateFlow<LoginUiState> = _ui
 
     init {
-        // If already signed in, navigate immediately
         auth.currentUser()?.let { _ui.value = _ui.value.copy(isLoggedIn = true) }
-
-        // Optional: react to future auth changes
-        scope.launch {
-            auth.authState.collectLatest { user ->
-                _ui.value = _ui.value.copy(isLoggedIn = user != null)
-            }
-        }
     }
 
     fun onEmailChange(value: String) {
-        val error = validateEmail(value)
-        _ui.value = _ui.value.copy(email = value, emailError = error, errorMessage = null)
+        _ui.value = _ui.value.copy(
+            email = value,
+            emailError = validateEmail(value),
+            errorMessage = null
+        )
     }
 
     fun onPasswordChange(value: String) {
-        val error = validatePassword(value)
-        _ui.value = _ui.value.copy(password = value, passwordError = error, errorMessage = null)
+        _ui.value = _ui.value.copy(
+            password = value,
+            passwordError = validatePassword(value),
+            errorMessage = null
+        )
     }
 
     fun signIn() {
@@ -62,7 +59,7 @@ class LoginViewModel(
             _ui.value = s.copy(isLoading = true, errorMessage = null)
             when (val res = auth.signIn(s.email.trim(), s.password)) {
                 is AppResult.Ok  -> _ui.value = _ui.value.copy(isLoading = false, isLoggedIn = true)
-                is AppResult.Err -> _ui.value = _ui.value.copy(isLoading = false, errorMessage = mapError(res.error))
+                is AppResult.Err -> _ui.value = _ui.value.copy(isLoading = false, errorMessage = mapSignInError(res.error))
             }
         }
     }
@@ -74,7 +71,7 @@ class LoginViewModel(
             _ui.value = s.copy(isLoading = true, errorMessage = null)
             when (val res = auth.signUp(s.email.trim(), s.password)) {
                 is AppResult.Ok  -> _ui.value = _ui.value.copy(isLoading = false, isLoggedIn = true)
-                is AppResult.Err -> _ui.value = _ui.value.copy(isLoading = false, errorMessage = mapError(res.error))
+                is AppResult.Err -> _ui.value = _ui.value.copy(isLoading = false, errorMessage = mapSignUpError(res.error))
             }
         }
     }
@@ -91,6 +88,24 @@ class LoginViewModel(
     private fun validatePassword(pw: String): String? =
         if (pw.length >= 6) null else "Min 6 characters"
 
-    private fun mapError(t: Throwable): String =
-        t.message ?: "Authentication failed"
+    private fun mapSignInError(t: Throwable): String {
+        val m = t.message?.lowercase().orEmpty()
+        return when {
+            "no user record" in m || "user-not-found" in m      -> "No account found for this email."
+            "password is invalid" in m || "wrong-password" in m -> "Incorrect password."
+            "badly formatted" in m || "invalid-email" in m      -> "Invalid email."
+            "too many requests" in m                            -> "Too many attempts, try later."
+            else                                                -> "Sign-in failed: ${t.message}"
+        }
+    }
+
+    private fun mapSignUpError(t: Throwable): String {
+        val m = t.message?.lowercase().orEmpty()
+        return when {
+            "already in use" in m || "email-already-in-use" in m -> "Email already in use."
+            "weak-password" in m                                 -> "Password is too weak."
+            "invalid-email" in m                                 -> "Invalid email."
+            else                                                 -> "Sign-up failed: ${t.message}"
+        }
+    }
 }

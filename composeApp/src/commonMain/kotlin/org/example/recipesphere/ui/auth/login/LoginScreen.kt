@@ -21,6 +21,7 @@ fun LoginScreen(
 ) {
     val ui by viewModel.ui.collectAsState()
 
+    // Navigate ONLY after a verified sign-in/sign-up success
     LaunchedEffect(ui.isLoggedIn) {
         if (ui.isLoggedIn) {
             onLoginSuccess()
@@ -28,12 +29,10 @@ fun LoginScreen(
         }
     }
 
-    Scaffold(
-        topBar = { TopAppBar(title = { Text("Login") }) }
-    ) { innerPadding ->
+    Scaffold(topBar = { TopAppBar(title = { Text("Login") }) }) { inner ->
         Column(
             modifier = Modifier
-                .padding(innerPadding)
+                .padding(inner)
                 .fillMaxSize()
                 .padding(24.dp),
             verticalArrangement = Arrangement.Center,
@@ -44,7 +43,7 @@ fun LoginScreen(
                 onValueChange = viewModel::onEmailChange,
                 label = { Text("Email") },
                 isError = ui.emailError != null,
-                supportingText = { if (ui.emailError != null) Text(ui.emailError!!) },
+                supportingText = { ui.emailError?.let { Text(it) } },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -54,38 +53,32 @@ fun LoginScreen(
                 onValueChange = viewModel::onPasswordChange,
                 label = { Text("Password") },
                 isError = ui.passwordError != null,
-                supportingText = { if (ui.passwordError != null) Text(ui.passwordError!!) },
+                supportingText = { ui.passwordError?.let { Text(it) } },
                 visualTransformation = PasswordVisualTransformation(),
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(Modifier.height(12.dp))
 
-            if (ui.errorMessage != null) {
-                Text(ui.errorMessage!!, color = MaterialTheme.colorScheme.error)
+            ui.errorMessage?.let {
+                Text(it, color = MaterialTheme.colorScheme.error)
                 Spacer(Modifier.height(8.dp))
             }
 
             Button(
-                onClick = { viewModel.signIn() },
+                onClick = viewModel::signIn,
                 enabled = ui.canSubmit && !ui.isLoading,
                 modifier = Modifier.fillMaxWidth()
             ) { Text(if (ui.isLoading) "Signing in…" else "Sign in") }
 
             Spacer(Modifier.height(8.dp))
 
+            // Keep explicit sign-up. If the user isn't registered, sign-in will fail and they won't enter.
             OutlinedButton(
-                onClick = { viewModel.signUp() },
+                onClick = viewModel::signUp,
                 enabled = ui.canSubmit && !ui.isLoading,
                 modifier = Modifier.fillMaxWidth()
             ) { Text("Create account") }
-
-            Spacer(Modifier.height(8.dp))
-
-            TextButton(
-                onClick = onLoginSuccess, // keep guest path if you like
-                enabled = !ui.isLoading
-            ) { Text("Continue as guest") }
         }
     }
 }
