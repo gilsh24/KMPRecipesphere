@@ -54,6 +54,8 @@ kotlin {
             implementation(libs.android.driver)
             implementation(libs.firebase.common.ktx)
             implementation(libs.play.services.location)
+            implementation(libs.lottie.compose)
+
         }
         commonMain.dependencies {
             implementation(compose.runtime)

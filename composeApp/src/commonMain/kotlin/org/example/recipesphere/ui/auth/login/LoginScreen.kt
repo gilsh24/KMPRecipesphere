@@ -38,6 +38,13 @@ fun LoginScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            LoginAnimation(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+            )
+            Spacer(Modifier.height(8.dp))
+
             OutlinedTextField(
                 value = ui.email,
                 onValueChange = viewModel::onEmailChange,
